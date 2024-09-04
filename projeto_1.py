@@ -30,6 +30,33 @@ def process_input(arquivo):
     # Retorna a lista de processos
     return processos
 
+# Função para calcular os tempos médios usando First Come First Send
+def FCFS(processos):
+    fila_processos = []
+    n = len(processos)
+    tempo = 0
+
+    tempos_retorno = 0
+    tempos_resposta = 0
+    tempos_espera = 0
+
+    for processo in processos:
+        if len(fila_processos) == 0:
+            fila_processos.append(processo)
+            tempos_retorno += processo.duracao
+            tempo += processo.duracao
+        else:
+            tempos_retorno += processo.duracao + tempo - processo.chegada
+            tempos_resposta += tempo - processo.chegada
+            tempos_espera += tempo - processo.chegada
+            tempo += processo.duracao
+
+    media_retorno = tempos_retorno/ n
+    media_resposta = tempos_resposta / n
+    media_espera = tempos_espera / n
+
+    return media_retorno, media_resposta, media_espera
+
 # Função para calcular os tempos médios usando Round Robin
 def RR(processos, quantum):
     fila_prontos = []
@@ -47,7 +74,7 @@ def RR(processos, quantum):
         if fila_prontos != 0:
             if tempo == 0:       
                 fila_processamento.append(fila_prontos[0].id)
-                print(f'{fila_processamento[-1]} no tempo {tempo}')
+                # print(f'{fila_processamento[-1]} no tempo {tempo}')
 
             elif tempo_processo == quantum:
                 fila_prontos[0].duracao_variavel -= 1
@@ -59,7 +86,7 @@ def RR(processos, quantum):
                 if len(fila_prontos) == 0:
                     break
                 fila_processamento.append(fila_prontos[0].id)
-                print(f'{fila_processamento[-1]} no tempo {tempo}')
+                # print(f'{fila_processamento[-1]} no tempo {tempo}')
                 
                 tempo_processo = 0
             else:    
@@ -82,9 +109,9 @@ def RR(processos, quantum):
 
     return fila_processamento
 
-def calcular_tempos_medios(processos, fila_processamento, quantum):
+def calcular_tempos_medios_rr(processos, fila_processamento, quantum):
     tempos_retorno = 0
-    tempos_resposta = 0  # -1 indica que ainda não foi respondido
+    tempos_resposta = 0
     tempos_espera = 0
 
     # Iterar sobre cada processo
@@ -134,11 +161,12 @@ processos = process_input('entrada.txt')
 fila_processamento = RR(processos, quantum=2)
 
 # Calcular tempos médios
-media_retorno, media_resposta, media_espera = calcular_tempos_medios(processos, fila_processamento, quantum=2)
+media_retorno_FCFS, media_resposta_FCFS, media_espera_FCFS = FCFS(processos)
+media_retorno_rr, media_resposta_rr, media_espera_rr = calcular_tempos_medios_rr(processos, fila_processamento, quantum=2)
 # # Calcula os tempos médios usando Round Robin com quantum = 2
 # media_retorno, media_resposta, media_espera = calcular_tempos_medios(processos, quantum=2)
 
 # Exibir resultados
-print(f"Tempo médio de retorno: {media_retorno:.1f}")
-print(f"Tempo médio de resposta: {media_resposta:.1f}")
-print(f"Tempo médio de espera: {media_espera:.1f}")
+print(f"FCFS {media_retorno_FCFS:.1f} {media_resposta_FCFS:.1f} {media_espera_FCFS:.1f}")
+print(f"RR {media_retorno_rr:.1f} {media_resposta_rr:.1f} {media_espera_rr:.1f}")
+
