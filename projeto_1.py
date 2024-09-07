@@ -66,6 +66,50 @@ def FCFS(processos):
 
     return media_retorno, media_resposta, media_espera
 
+def SJF(processos):
+    processos_terminados = 0
+    processos_disponiveis = []
+    n = len(processos)
+    tempo = 0
+
+    fila_processamento = []
+
+    tempos_retorno = 0
+    tempos_resposta = 0
+    tempos_espera = 0
+
+    while processos_terminados != n:
+        # Encontrar os processos que já chegaram
+        for processo in processos:
+            if processo.chegada <= tempo and processo not in processos_disponiveis and processo not in fila_processamento:
+                processos_disponiveis.append(processo) 
+
+        # Se não há nenhum processo disponível, avança o tempo
+        if not processos_disponiveis and not fila_processamento:
+            tempo = processos[0].chegada
+
+        # Encontar o próximo processo a ser executado entre os disponíveis
+        processo_atual = processos_disponiveis[0]
+        for processo in processos_disponiveis:
+            if processo.duracao < processo_atual.duracao:
+                processo_atual = processo
+
+        tempos_espera += tempo - processo_atual.chegada
+        tempos_resposta += tempo - processo_atual.chegada
+        tempos_retorno += tempo + processo_atual.duracao - processo_atual.chegada
+
+        tempo += processo_atual.duracao
+
+        processos_terminados += 1
+        fila_processamento.append(processo_atual)
+        processos_disponiveis.remove(processo_atual)
+
+    media_retorno = tempos_retorno / n
+    media_resposta = tempos_resposta / n
+    media_espera = tempos_espera / n
+
+    return media_retorno, media_resposta, media_espera
+
 # Função para conseguir a ordem de acontecimento dos processos até acabarem
 def RR(processos, quantum):
     fila_prontos = []           # Fila para saber se o tempo do processo ja chegou
@@ -181,14 +225,16 @@ def calcular_tempos_medios_rr(processos, fila_processamento, quantum):
 # Executa a função process_input e passa a lista de processos como parâmetro
 processos = process_input('entrada.txt')
 
-
 # Calcular tempos médios
 media_retorno_FCFS, media_resposta_FCFS, media_espera_FCFS = FCFS(processos)
+
+media_retorno_SJF, media_resposta_SJF, media_espera_SJF = SJF(processos)
 
 fila_processamento = RR(processos, quantum=2)
 media_retorno_rr, media_resposta_rr, media_espera_rr = calcular_tempos_medios_rr(processos, fila_processamento, quantum=2)
 
 # Exibir resultados
 print(f"FCFS {media_retorno_FCFS:.1f} {media_resposta_FCFS:.1f} {media_espera_FCFS:.1f}")
+print(f"SJF {media_retorno_SJF:.1f} {media_resposta_SJF:.1f} {media_espera_SJF:.1f}")
 print(f"RR {media_retorno_rr:.1f} {media_resposta_rr:.1f} {media_espera_rr:.1f}")
 
