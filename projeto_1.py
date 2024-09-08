@@ -85,8 +85,9 @@ def SJF(processos):
                 processos_disponiveis.append(processo) 
 
         # Se não há nenhum processo disponível, avança o tempo
-        if not processos_disponiveis and not fila_processamento:
-            tempo = processos[0].chegada
+        if not processos_disponiveis:
+            tempo += 1
+            continue
 
         # Encontar o próximo processo a ser executado entre os disponíveis
         processo_atual = processos_disponiveis[0]
