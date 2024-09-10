@@ -1,3 +1,6 @@
+# Rafael de Melo Oliveira - 20200013481
+# Virgílio Schettini de Oliveira Neto - 20200013848
+
 import math
 
 class Processo:
@@ -67,21 +70,19 @@ def FCFS(processos):
     return media_retorno, media_resposta, media_espera
 
 def SJF(processos):
-    processos_terminados = 0
+    processos_terminados = []
     processos_disponiveis = []
     n = len(processos)
     tempo = 0
-
-    fila_processamento = []
 
     tempos_retorno = 0
     tempos_resposta = 0
     tempos_espera = 0
 
-    while processos_terminados != n:
+    while len(processos_terminados) != n:
         # Encontrar os processos que já chegaram
         for processo in processos:
-            if processo.chegada <= tempo and processo not in processos_disponiveis and processo not in fila_processamento:
+            if processo.chegada <= tempo and processo not in processos_disponiveis and processo not in processos_terminados:
                 processos_disponiveis.append(processo) 
 
         # Se não há nenhum processo disponível, avança o tempo
@@ -101,8 +102,8 @@ def SJF(processos):
 
         tempo += processo_atual.duracao
 
-        processos_terminados += 1
-        fila_processamento.append(processo_atual)
+        
+        processos_terminados.append(processo_atual)
         processos_disponiveis.remove(processo_atual)
 
     media_retorno = tempos_retorno / n
@@ -134,7 +135,6 @@ def RR(processos, quantum):
              # Caso o tempo seja 0
             if tempo == 0:       
                 fila_processamento.append(fila_prontos[0].id)
-                print(f'{fila_processamento[-1]} no tempo {tempo}')
             
             # Se o processo já rodou o tempo do quantum, troca de processo
             elif tempo_processo == quantum:
@@ -147,7 +147,6 @@ def RR(processos, quantum):
                     processos_terminados += 1
                 if len(fila_prontos) != 0:
                     fila_processamento.append(fila_prontos[0].id)
-                    print(f'{fila_processamento[-1]} no tempo {tempo}')
                 
                 # Reseta o tempo do processo
                 tempo_processo = 0
@@ -175,10 +174,7 @@ def RR(processos, quantum):
             processo_parado = True
             fila_processamento.append(-1)
         tempo += 1
-    print(fila_processamento)
-    for processo in fila_prontos:
-        print(processo.id)
-
+        
     return fila_processamento
 
 # Função para calcular os tempos médios baseados na fila de processamento de Round Robin
@@ -203,19 +199,18 @@ def calcular_tempos_medios_rr(processos, fila_processamento, quantum):
             tempo += tempo_processado
         else:
             tempo += 1
-            tempo_processado = 1
 
         # Atualiza o tempo de espera para todos os outros processos que estão aguardando
-        for processo in processos:
-            if processo.id != idx and processo.duracao_variavel > 0 and tempo > processo.chegada:
-                tempos_retorno[processo.id - 1] += tempo_processado
-                if processo.duracao == processo.duracao_variavel:
-                    tempos_espera[processo.id - 1] = tempo - processo.chegada
-                    tempos_resposta[processo.id - 1] = tempo - processo.chegada
-                else:
-                    tempos_espera[processo.id - 1] += tempo_processado
+        if idx != -1:
+            for processo in processos:
+                if processo.id != idx and processo.duracao_variavel > 0 and tempo > processo.chegada:
+                    tempos_retorno[processo.id - 1] += tempo_processado
+                    if processo.duracao == processo.duracao_variavel:
+                        tempos_espera[processo.id - 1] = tempo - processo.chegada
+                        tempos_resposta[processo.id - 1] = tempo - processo.chegada
+                    else:
+                        tempos_espera[processo.id - 1] += tempo_processado
     
-    print(tempos_espera)
     # Calcula as médias
     media_retorno = sum(tempos_retorno)/ n
     media_resposta = sum(tempos_resposta) / n
