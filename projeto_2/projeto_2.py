@@ -2,7 +2,6 @@
 # Virgílio Schettini de Oliveira Neto - 20200013848
 
 def ler_arquivo(arquivo):
-    # ler o conteúdo do arquivo
     with open(arquivo, 'r') as arquivo:
         linhas = arquivo.readlines()
     
